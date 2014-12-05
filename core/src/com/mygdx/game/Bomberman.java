@@ -2,26 +2,26 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.InputProcessor;
+import com.mygdx.game.model.MovingObject;
 import com.mygdx.game.model.World;
 
 public class Bomberman extends ApplicationAdapter implements InputProcessor {
 	private World world;
 	private WorldRenderer renderer;
-	private WorldController controller;
 	
 	@Override
 	public void create () {
 		world = new World();
 		renderer = new WorldRenderer(world);
-		controller = new WorldController(world);
 		Gdx.input.setInputProcessor(this);
 	}
 
 	@Override
 	public void render () {
-		controller.update(Gdx.graphics.getDeltaTime());
+		world.update(Gdx.graphics.getDeltaTime());
 		Gdx.gl.glClearColor(0.86f, 0.63f, 0.09f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		renderer.render();
@@ -29,13 +29,31 @@ public class Bomberman extends ApplicationAdapter implements InputProcessor {
 	
 	@Override
     public boolean keyDown(int keycode) {
-		controller.keyDown(keycode);
+		switch (keycode) {
+		case Keys.RIGHT:
+			world.player.state = MovingObject.State.MOVING_RIGHT;
+			break;
+		case Keys.LEFT:
+			world.player.state = MovingObject.State.MOVING_LEFT;
+			break;
+		case Keys.UP:
+			world.player.state = MovingObject.State.MOVING_UP;
+			break;
+		case Keys.DOWN:
+			world.player.state = MovingObject.State.MOVING_DOWN;
+			break;
+		}
         return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-    	controller.keyUp(keycode);
+    	if ((keycode == Keys.RIGHT && world.player.state == MovingObject.State.MOVING_RIGHT)
+    			|| (keycode == Keys.LEFT && world.player.state == MovingObject.State.MOVING_LEFT)
+    			|| (keycode == Keys.UP && world.player.state == MovingObject.State.MOVING_UP)
+    			|| (keycode == Keys.DOWN && world.player.state == MovingObject.State.MOVING_DOWN)) {
+    			world.player.state = MovingObject.State.STAND;
+    	}
         return true;
     }
 	
